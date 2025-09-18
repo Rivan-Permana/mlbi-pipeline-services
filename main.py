@@ -23,7 +23,7 @@ app = FastAPI(title="ML BI Pipeline API", version="1.0.0")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["localhost:5173", "https://convoinsight.vercel.app/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,7 +32,6 @@ app.add_middleware(
 # Environment variables
 PROJECT_ID = os.getenv("PROJECT_ID")
 GCS_BUCKET = os.getenv("GCS_BUCKET")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Initialize clients
