@@ -174,7 +174,7 @@ async def process_query(request: QueryRequest):
                 os.remove(local_path)
 
         # Set API key
-        api_key = GEMINI_API_KEY or OPENAI_API_KEY
+        api_key = GEMINI_API_KEY
         if not api_key:
             raise HTTPException(status_code=500, detail="No API key configured")
 
