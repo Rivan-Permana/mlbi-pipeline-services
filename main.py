@@ -23,7 +23,12 @@ app = FastAPI(title="ML BI Pipeline API", version="1.0.0")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["localhost:5173", "https://convoinsight.vercel.app/"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://convoinsight.vercel.app"  # tanpa trailing slash
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",  # cover semua preview vercel
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
