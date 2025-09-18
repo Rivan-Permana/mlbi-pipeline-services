@@ -39,4 +39,4 @@ EXPOSE 8080
 
 # Jalankan app: objek FastAPI ada di main.py → app
 # Cloud Run akan menyuplai $PORT; bind ke 0.0.0.0:$PORT
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-w", "2", "-b", "0.0.0.0:${PORT}", "main:app"]
+CMD ["sh", "-c", "gunicorn -k uvicorn.workers.UvicornWorker -w 2 -b 0.0.0.0:$PORT main:app"]
