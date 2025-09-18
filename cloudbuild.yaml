@@ -1,0 +1,49 @@
+substitutions:
+  _REGION: asia-southeast2
+  _REPO: python-services              # nama repo Artifact Registry
+  _SERVICE: ml-bi-pipeline-api        # nama Cloud Run service
+  _IMAGE: ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE}:$COMMIT_SHA
+  _GCS_BUCKET: convoinsight-assets
+  _RUNTIME_SA: ${_SERVICE}-sa@${PROJECT_ID}.iam.gserviceaccount.com
+  _GEMINI_SECRET: GEMINI_API_KEY      # nama secret di Secret Manager
+
+steps:
+  # Build image
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "${_IMAGE}", "."]
+
+  # Push ke Artifact Registry
+  - name: gcr.io/cloud-builders/docker
+    args: ["push", "${_IMAGE}"]
+
+  # Deploy ke Cloud Run
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud run deploy ${_SERVICE} \
+          --image ${_IMAGE} \
+          --region ${_REGION} \
+          --platform managed \
+          --allow-unauthenticated \
+          --service-account ${_RUNTIME_SA} \
+          --memory=8Gi \
+          --cpu=2 \
+          --timeout=3600s \
+          --concurrency=80 \
+          --min-instances=0 \
+          --max-instances=5 \
+          --set-env-vars=PROJECT_ID=${PROJECT_ID},GCS_BUCKET=${_GCS_BUCKET} \
+          --set-secrets="GEMINI_API_KEY=${_GEMINI_SECRET}:latest" \
+          --set-secrets="OPENAI_API_KEY=${_OPENAI_SECRET}:latest" \
+          --port=8080
+
+images:
+  - ${_IMAGE}
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
+timeout: 1200s

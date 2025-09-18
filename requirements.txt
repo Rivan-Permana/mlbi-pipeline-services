@@ -1,0 +1,9 @@
+fastapi==0.116.2
+uvicorn[standard]==0.35.0
+python-multipart==0.0.20
+pandasai>=3.0.0b2
+pandasai-litellm==0.0.1
+google-cloud-storage==3.4.0
+google-cloud-firestore==2.21.0
+plotly==6.3.0
+python-json-logger==3.3.0
