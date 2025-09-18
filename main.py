@@ -10,6 +10,8 @@ from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from google.cloud import storage, firestore
 from litellm import completion
 import pandasai as pai
@@ -17,18 +19,30 @@ from pandasai import SmartDataframe, SmartDatalake
 from pandasai_litellm.litellm import LiteLLM
 from pandasai.core.response.dataframe import DataFrameResponse
 
+# Settings class - define this FIRST
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    # CORS Origins with default values
+    CORS_ORIGINS: List[str] = Field(
+        default=[
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "https://convoinsight.vercel.app"
+        ]
+    )
+
+# Initialize settings
+settings = Settings()
+
 # Initialize FastAPI app
 app = FastAPI(title="ML BI Pipeline API", version="1.0.0")
 
-# CORS middleware
+# CORS middleware - now settings is defined
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "https://convoinsight.vercel.app"  # tanpa trailing slash
-    ],
-    allow_origin_regex=r"https://.*\.vercel\.app",  # cover semua preview vercel
+    allow_origins=settings.CORS_ORIGINS,
+    allow_origin_regex=r"https://.*\.vercel\.app",  # This allows all Vercel preview deployments
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

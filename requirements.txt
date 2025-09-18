@@ -7,3 +7,4 @@ google-cloud-storage==3.4.0
 google-cloud-firestore==2.21.0
 plotly==6.3.0
 python-json-logger==3.3.0
+pydantic-settings==2.4.0
